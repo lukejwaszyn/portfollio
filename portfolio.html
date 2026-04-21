@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WASZYN // Mission Control</title>
+<meta name="description" content="Luke J. Waszyn II — Engineering Science @ Penn State. Systems engineering, RF & signal processing, space systems.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #050507;
+  --bg-deep: #020204;
+  --panel: rgba(14, 16, 22, 0.82);
+  --panel-solid: #0e1016;
+  --border: rgba(160, 185, 210, 0.10);
+  --border-bright: rgba(160, 185, 210, 0.20);
+  --accent: #7eb8d8;
+  --accent-dim: rgba(126, 184, 216, 0.25);
+  --accent-glow: rgba(126, 184, 216, 0.06);
+  --accent-bright: #a8d4ee;
+  --gold: #cc2233;
+  --gold-dim: rgba(204, 34, 51, 0.2);
+  --red: #cc2233;
+  --green: #7eb8d8;
+  --silver: #9ca3af;
+  --text: #c8ced6;
+  --text-dim: #585e6a;
+  --text-bright: #e8ecf0;
+  --text-white: #f0f4f8;
+  --section-gap: 100vh;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ====== STARFIELD CANVAS ====== */
+#starfield {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+}
+
+/* ====== SCANLINES ====== */
+.scanlines {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.015) 3px, rgba(0,0,0,0.015) 6px);
+}
+
+/* ====== GRID OVERLAY ====== */
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0.02;
+  background-image:
+    linear-gradient(var(--accent) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* ====== NAVIGATION ====== */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(180deg, rgba(3,6,10,0.98) 0%, rgba(3,6,10,0.8) 70%, transparent 100%);
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  transition: transform 0.4s;
+}
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 5px; color: var(--accent);
+  text-shadow: 0 0 30px var(--accent-dim);
+}
+.nav-logo span { color: var(--text-dim); font-weight: 300; letter-spacing: 3px; }
+.nav-links {
+  display: flex; gap: 28px; align-items: center;
+}
+.nav-links a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-dim); text-decoration: none;
+  transition: color 0.3s, text-shadow 0.3s;
+  position: relative;
+}
+.nav-links a:hover {
+  color: var(--accent);
+  text-shadow: 0 0 15px var(--accent-dim);
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+  height: 1px; background: var(--accent);
+  transform: scaleX(0); transition: transform 0.3s;
+}
+.nav-links a:hover::after { transform: scaleX(1); }
+
+/* ====== HERO ====== */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 2;
+  overflow: hidden;
+}
+.hero-orbit {
+  position: absolute;
+  border: 1px solid rgba(91, 164, 212, 0.05);
+  border-radius: 50%;
+  animation: orbit-spin 60s linear infinite;
+}
+.hero-orbit:nth-child(1) { width: 500px; height: 500px; }
+.hero-orbit:nth-child(2) { width: 700px; height: 700px; animation-duration: 90s; animation-direction: reverse; }
+.hero-orbit:nth-child(3) { width: 900px; height: 900px; animation-duration: 120s; }
+.hero-orbit::after {
+  content: '';
+  position: absolute; top: -3px; left: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent), 0 0 40px var(--accent-dim);
+}
+@keyframes orbit-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.hero-content {
+  text-align: center; z-index: 5;
+  animation: fadeUp 1.5s ease-out;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 20px;
+  text-shadow: 0 0 20px var(--accent-dim);
+  animation: fadeUp 1.5s ease-out 0.2s both;
+}
+.hero-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(48px, 8vw, 100px);
+  font-weight: 900; letter-spacing: -2px;
+  color: var(--text-white);
+  line-height: 0.95;
+  animation: fadeUp 1.5s ease-out 0.4s both;
+}
+.hero-name .accent { color: var(--accent); }
+.hero-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; letter-spacing: 3px;
+  color: var(--text-dim); margin-top: 24px;
+  animation: fadeUp 1.5s ease-out 0.6s both;
+}
+.hero-stats {
+  display: flex; gap: 40px; margin-top: 48px;
+  justify-content: center; align-items: center;
+  animation: fadeUp 1.5s ease-out 0.8s both;
+}
+.hero-stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px; font-weight: 700;
+  color: var(--accent-bright);
+  text-shadow: 0 0 20px var(--accent-dim);
+  text-align: center;
+}
+.hero-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 4px;
+  text-align: center;
+}
+.hero-scroll {
+  position: absolute; bottom: 40px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 3px; color: var(--text-dim);
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+.hero-cta {
+  display: flex; gap: 16px; margin-top: 36px;
+  justify-content: center;
+  animation: fadeUp 1.5s ease-out 1s both;
+}
+.btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 12px 28px; border-radius: 4px;
+  text-decoration: none; transition: all 0.3s;
+  cursor: pointer; border: 1px solid var(--border-bright);
+  background: transparent; color: var(--text);
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 30px var(--accent-glow); }
+.btn-primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+.btn-primary:hover { background: var(--accent-bright); box-shadow: 0 0 40px var(--accent-dim); color: var(--bg); }
+
+/* ====== SECTION COMMON ====== */
+.section {
+  position: relative; z-index: 2;
+  padding: 120px 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 32px; padding-right: 32px;
+}
+.section-header {
+  margin-bottom: 64px;
+}
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--accent);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.section-tag::before {
+  content: ''; width: 32px; height: 1px;
+  background: var(--accent); box-shadow: 0 0 8px var(--accent);
+}
+.section-title {
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 800; color: var(--text-white);
+  letter-spacing: -1px; line-height: 1.1;
+}
+.section-subtitle {
+  font-size: 16px; color: var(--text-dim);
+  margin-top: 12px; max-width: 600px;
+  line-height: 1.6;
+}
+
+/* ====== ABOUT ====== */
+.about-grid {
+  display: grid; grid-template-columns: 1.2fr 1fr;
+  gap: 64px; align-items: start;
+}
+.about-portrait-wrap {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 20px;
+}
+.about-portrait {
+  width: 100%; max-width: 320px;
+  aspect-ratio: 1 / 1.15;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-bright);
+  box-shadow: 0 0 40px var(--accent-glow);
+  position: relative;
+  background: var(--panel-solid);
+}
+.about-portrait img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: grayscale(15%) contrast(1.05);
+  transition: filter 0.6s;
+}
+.about-portrait:hover img { filter: grayscale(0%) contrast(1.1); }
+.about-portrait::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2;
+  border: 1px solid var(--accent-dim);
+  border-radius: 8px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 0%, transparent 70%, var(--accent-glow) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(126,184,216,0.02) 2px, rgba(126,184,216,0.02) 4px);
+}
+.about-portrait::after {
+  content: 'ID-4412-LJW'; position: absolute; bottom: 10px; left: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-dim);
+  z-index: 3;
+}
+.about-text p {
+  font-size: 17px; line-height: 1.75;
+  color: var(--text); margin-bottom: 20px;
+}
+.about-text strong { color: var(--text-bright); font-weight: 600; }
+.about-info {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.info-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  padding: 20px 24px; border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+.info-card-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+}
+.info-card-value {
+  font-size: 14px; color: var(--text-bright); font-weight: 500;
+  line-height: 1.5;
+}
+.info-card-sub {
+  font-size: 12px; color: var(--text-dim); margin-top: 6px;
+  line-height: 1.5;
+}
+.skills-row {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
+}
+.skill-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--text-bright);
+  background: rgba(126, 184, 216, 0.06);
+  border: 1px solid var(--accent-dim);
+  padding: 3px 9px; border-radius: 2px;
+  transition: all 0.2s;
+}
+.skill-tag:hover {
+  background: var(--accent-dim);
+  color: var(--accent-bright);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* ====== PROJECTS ====== */
+.project-featured {
+  background: var(--panel);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px; padding: 40px;
+  margin-bottom: 32px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s;
+}
+.project-featured:hover { border-color: var(--accent-dim); box-shadow: 0 0 60px var(--accent-glow); }
+.project-featured::before {
+  content: '';
+  position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--accent), transparent);
+}
+.project-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--gold);
+  background: var(--gold-dim);
+  border: 1px solid rgba(204,34,51,0.3);
+  padding: 4px 10px; border-radius: 3px;
+  margin-bottom: 16px;
+}
+.project-title {
+  font-size: 28px; font-weight: 700;
+  color: var(--text-white);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.project-meta {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--accent);
+  margin-bottom: 20px;
+}
+.project-desc {
+  font-size: 15px; line-height: 1.75;
+  color: var(--text); margin-bottom: 24px;
+}
+.project-tech {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 24px;
+}
+.tech-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text);
+  background: var(--panel-solid);
+  border: 1px solid var(--border-bright);
+  padding: 4px 10px; border-radius: 3px;
+  transition: all 0.2s;
+}
+.tech-tag:hover { border-color: var(--accent); color: var(--accent-bright); }
+
+/* V-timeline */
+.v-timeline {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 4px; margin: 24px 0;
+  position: relative;
+}
+.v-stage {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 2px; position: relative;
+}
+.v-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid var(--border-bright); background: var(--bg-deep);
+  margin-bottom: 8px; z-index: 2; position: relative;
+  transition: all 0.3s;
+}
+.v-stage.complete .v-dot {
+  background: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+.v-stage.active .v-dot {
+  background: var(--gold); border-color: var(--gold);
+  box-shadow: 0 0 16px rgba(204,34,51,0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.v-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 1px; color: var(--text);
+  font-weight: 700;
+}
+.v-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; color: var(--text-dim);
+  text-align: center; line-height: 1.3; margin-top: 4px;
+}
+.v-timeline::before {
+  content: ''; position: absolute;
+  top: 17px; left: 2%; right: 2%; height: 1px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 55%, var(--gold) 55%, var(--gold) 60%, var(--border) 60%, var(--border) 100%);
+  z-index: 1;
+}
+
+.project-highlights {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-top: 16px;
+}
+.highlight-card {
+  background: rgba(126, 184, 216, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px; padding: 16px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.highlight-card:hover {
+  border-color: var(--accent-dim);
+  background: rgba(126, 184, 216, 0.08);
+}
+.highlight-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px; font-weight: 700;
+  color: var(--accent-bright);
+  text-shadow: 0 0 12px var(--accent-dim);
+}
+.highlight-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 4px;
+}
+
+/* ====== FEATURED MEDIA (hero image/gallery for a project) ====== */
+.project-media {
+  margin: 0 -40px 28px -40px;
+  position: relative;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.project-media-hero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s;
+}
+.project-featured:hover .project-media-hero { transform: scale(1.02); }
+.project-media-caption {
+  position: absolute; bottom: 12px; left: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(2,2,4,0.75);
+  padding: 4px 10px; border-radius: 2px;
+  backdrop-filter: blur(4px);
+}
+
+.media-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 0 -40px 28px -40px;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.media-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s, transform 0.6s;
+  filter: brightness(0.9);
+}
+.media-gallery img:hover { filter: brightness(1); transform: scale(1.02); }
+
+/* ====== SUBSYSTEM LIST (for LunaRecycle) ====== */
+.subsystem-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(126, 184, 216, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.subsystem-cell {
+  text-align: center;
+  padding: 10px 4px;
+  border-right: 1px solid var(--border);
+}
+.subsystem-cell:last-child { border-right: none; }
+.subsystem-abbr {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent-bright);
+  text-shadow: 0 0 8px var(--accent-dim);
+  letter-spacing: 1px;
+}
+.subsystem-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-dim); margin-top: 4px;
+}
+
+/* Grid (secondary projects) */
+.projects-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+}
+.project-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 28px;
+  transition: all 0.4s;
+  backdrop-filter: blur(10px);
+  display: flex; flex-direction: column;
+}
+.project-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+.project-card-image {
+  width: calc(100% + 56px);
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  margin: -28px -28px 20px -28px;
+  display: block;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ====== RESEARCH & EXPERIENCE ====== */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+}
+.timeline::before {
+  content: ''; position: absolute;
+  left: 6px; top: 8px; bottom: 8px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--accent), transparent);
+}
+.timeline-item {
+  position: relative; margin-bottom: 40px;
+  padding-bottom: 20px;
+}
+.timeline-item::before {
+  content: ''; position: absolute;
+  left: -32px; top: 6px;
+  width: 13px; height: 13px;
+  border: 2px solid var(--accent);
+  background: var(--bg);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-dim);
+}
+.timeline-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--accent);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.timeline-role {
+  font-size: 17px; font-weight: 600;
+  color: var(--text-white); margin-bottom: 4px;
+}
+.timeline-org {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.timeline-bullets {
+  list-style: none; padding: 0;
+}
+.timeline-bullets li {
+  position: relative; padding-left: 20px;
+  font-size: 14px; color: var(--text);
+  line-height: 1.7; margin-bottom: 8px;
+}
+.timeline-bullets li::before {
+  content: '▸'; position: absolute; left: 0;
+  color: var(--accent);
+}
+
+/* Research cards */
+.research-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+}
+.research-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 32px;
+  transition: all 0.4s;
+}
+.research-card:hover {
+  border-color: var(--border-bright);
+  box-shadow: 0 0 40px var(--accent-glow);
+}
+.research-icon {
+  font-size: 28px; margin-bottom: 16px;
+}
+.research-lab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 8px;
+}
+.research-title {
+  font-size: 20px; font-weight: 700; color: var(--text-white);
+  margin-bottom: 12px;
+}
+.research-desc {
+  font-size: 14px; color: var(--text); line-height: 1.7;
+}
+.research-award {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--gold);
+  background: var(--gold-dim);
+  border: 1px solid rgba(204,34,51,0.3);
+  padding: 4px 12px; border-radius: 4px;
+  margin-top: 12px;
+}
+
+/* ====== INVOLVEMENT ====== */
+.involvement-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+}
+.involvement-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 24px;
+  transition: all 0.3s;
+}
+.involvement-card:hover { border-color: var(--border-bright); }
+.involvement-org {
+  font-size: 16px; font-weight: 600; color: var(--text-bright);
+  margin-bottom: 4px;
+}
+.involvement-roles {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--accent); line-height: 1.6;
+}
+.involvement-dates {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text-dim); margin-top: 8px;
+}
+
+/* ====== AWARDS ====== */
+.awards-row {
+  display: flex; flex-wrap: wrap; gap: 16px;
+}
+.award-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 24px;
+  display: flex; align-items: center; gap: 12px;
+  transition: all 0.3s;
+}
+.award-item:hover { border-color: rgba(204,34,51,0.3); }
+.award-icon { font-size: 20px; }
+.award-text { font-size: 14px; color: var(--text-bright); }
+.award-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim); }
+
+/* ====== CONTACT / FOOTER ====== */
+.footer {
+  position: relative; z-index: 2;
+  padding: 80px 32px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.footer-links {
+  display: flex; gap: 32px; justify-content: center; margin-top: 24px;
+  flex-wrap: wrap;
+}
+.footer-links a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 2px;
+  color: var(--text-dim); text-decoration: none;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--accent); }
+.footer-copy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text-dim);
+  margin-top: 24px; letter-spacing: 2px;
+}
+
+/* ====== FADE-IN ANIMATION ====== */
+.fade-in {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+.fade-in.visible {
+  opacity: 1; transform: translateY(0);
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 900px) {
+  .about-grid { grid-template-columns: 1fr; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .research-grid { grid-template-columns: 1fr; }
+  .involvement-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { flex-direction: column; gap: 16px; }
+  .project-featured { padding: 28px; }
+  .project-media, .media-gallery { margin-left: -28px; margin-right: -28px; }
+  .project-card-image { width: calc(100% + 56px); }
+  .nav-links { display: none; }
+  .project-highlights { grid-template-columns: 1fr 1fr; }
+  .subsystem-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .subsystem-cell { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+  .v-timeline { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .v-timeline::before { display: none; }
+}
+
+@media (max-width: 600px) {
+  .section { padding-left: 16px; padding-right: 16px; }
+  .project-highlights { grid-template-columns: 1fr; }
+  .involvement-grid { grid-template-columns: 1fr; }
+  .media-gallery { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- STARFIELD -->
+<canvas id="starfield"></canvas>
+<div class="scanlines"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">WASZYN II <span>// PORTFOLIO</span></div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#research">Research</a>
+    <a href="#experience">Experience</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-orbit"></div>
+  <div class="hero-orbit"></div>
+  <div class="hero-orbit"></div>
+  <div class="hero-content">
+    <div class="hero-pre">Penn State Engineering Science</div>
+    <h1 class="hero-name">LUKE J.<br><span class="accent">WASZYN II</span></h1>
+    <p class="hero-tagline">SYSTEMS ENGINEERING &middot; RF &amp; SIGNAL PROCESSING &middot; SPACE SYSTEMS</p>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">3.74</div>
+        <div class="hero-stat-label">GPA</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">8,500+</div>
+        <div class="hero-stat-label">Lines of Code</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">$1.2M</div>
+        <div class="hero-stat-label">Phase III Ceiling</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">5/5</div>
+        <div class="hero-stat-label">Dean's List</div>
+      </div>
+    </div>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="assets/Waszyn_Resume.pdf" class="btn" target="_blank">Download Resume</a>
+      <a href="https://github.com/lukejwaszyn" class="btn" target="_blank">GitHub</a>
+    </div>
+  </div>
+  <div class="hero-scroll">&#9660; SCROLL TO EXPLORE</div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="section-header fade-in">
+    <div class="section-tag">01 // About</div>
+    <h2 class="section-title">Mission Brief</h2>
+  </div>
+  <div class="about-grid">
+    <div class="about-text fade-in">
+      <!-- PORTRAIT on mobile/small: shown inline above text via media query reordering; on desktop shows in right column via grid order -->
+      <p>I'm a junior in <strong>Engineering Science</strong> at Penn State with a minor in <strong>Engineering Mechanics</strong> and a <strong>Certificate in Space Systems Engineering</strong>. I build systems that bridge hardware and software &mdash; from custom RF receive chains and analog circuits to ML pipelines and 3D mission control interfaces.</p>
+      <p>My work lives at the intersection of <strong>formal systems engineering</strong> and <strong>hands-on hardware</strong>. I co-lead systems engineering on a NASA LunaRecycle team competing in Phase III (prize ceiling $1.2M), operate an autonomous satellite ground station I built from scratch, and run verification campaigns on RF hardware I solder myself. I care about traceability, measured performance, and shipping things that actually work.</p>
+      <p>This summer I'll be joining <strong>Millennium Space Systems (Boeing)</strong> as a Spacecraft Systems Engineering intern.</p>
+    </div>
+    <div class="about-info">
+      <div class="about-portrait-wrap fade-in">
+        <div class="about-portrait">
+          <img src="assets/about/headshot.jpg" alt="Luke J. Waszyn II">
+        </div>
+      </div>
+      <div class="info-card fade-in">
+        <div class="info-card-label">Education</div>
+        <div class="info-card-value">B.S. Engineering Science &middot; May 2027</div>
+        <div class="info-card-sub">Penn State University &middot; GPA 3.74/4.00</div>
+        <div class="info-card-sub">Minor: Engineering Mechanics</div>
+        <div class="info-card-sub">Certificate: Space Systems Engineering</div>
+      </div>
+      <div class="info-card fade-in">
+        <div class="info-card-label">Technical Skills</div>
+        <div class="skills-row">
+          <span class="skill-tag">C++</span>
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">MATLAB</span>
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">Linux/Unix</span>
+          <span class="skill-tag">LabVIEW</span>
+          <span class="skill-tag">Simulink</span>
+          <span class="skill-tag">SolidWorks</span>
+          <span class="skill-tag">Multisim</span>
+          <span class="skill-tag">LTspice</span>
+          <span class="skill-tag">Three.js</span>
+          <span class="skill-tag">scikit-learn</span>
+          <span class="skill-tag">SGP4</span>
+          <span class="skill-tag">SDR</span>
+          <span class="skill-tag">Antenna Design</span>
+          <span class="skill-tag">VNA</span>
+          <span class="skill-tag">3D Printing</span>
+          <span class="skill-tag">Soldering</span>
+        </div>
+      </div>
+      <div class="info-card fade-in">
+        <div class="info-card-label">Coursework</div>
+        <div class="info-card-sub" style="line-height:1.8">
+          Systems Design (grad-level) &middot; Quantum Mechanics &middot; Signals &amp; Systems &middot;
+          Electromagnetics &middot; System Vibrations &middot; Circuits &amp; Devices &middot;
+          Computational Methods &middot; Materials Engineering &middot; Thermodynamics
+          <br><span style="color:var(--accent);font-size:9px;letter-spacing:1px;">UPCOMING:</span>
+          Software-Defined Radio &middot; RF &amp; Microwave Engineering &middot; Satellite Communication Systems &middot; Analysis in Engineering
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section" id="projects">
+  <div class="section-header fade-in">
+    <div class="section-tag">02 // Projects</div>
+    <h2 class="section-title">Mission Log</h2>
+    <p class="section-subtitle">End-to-end systems from concept through verification, built with real hardware and measured performance.</p>
+  </div>
+
+  <!-- FEATURED #1: LunaRecycle / RECLAIM -->
+  <div class="project-featured fade-in">
+    <div class="project-badge">&#9733; Featured &middot; NASA Phase III &middot; $1.2M Ceiling</div>
+    <h3 class="project-title">RECLAIM &mdash; NASA LunaRecycle Challenge</h3>
+    <div class="project-meta">
+      <span>&#127769; Lunar ISRU Recycling</span>
+      <span>&#128100; Joined post-Phase II as Co-Lead SE</span>
+      <span>&#128197; Jan 2026 &ndash; Present</span>
+      <span>&#127942; Phase II Winner &middot; Phase III Competing</span>
+    </div>
+
+    <!-- Hero: team concept sketches -->
+    <div class="project-media">
+      <img src="assets/lunarecycle/concept-sketches.jpg" alt="RECLAIM team concept sketches — pre-processing, metal casting, and gas collection" class="project-media-hero" style="aspect-ratio:auto; object-fit:contain; background:#f8f6ee; padding:20px;">
+      <div class="project-media-caption">Team Concept Sketches // Pre-Processing · Metal Casting · Gas Collection</div>
+    </div>
+
+    <p class="project-desc">
+      RECLAIM is a microwave-based in-situ recycling system designed for lunar surface operations. Under <strong>Penn State's Student Space Programs Lab (SSPL)</strong>, the team is developing a closed-loop platform that converts inhabitant waste &mdash; aluminum, Nomex, textiles, foam, and plastics &mdash; into usable feedstock through a three-stage thermal cycle: a 2.45 GHz solid-state microwave generator, dual-path thermal processing (SiC susceptor-coupled smelting for metals, inert-atmosphere pyrolysis for plastics), and automated material handling. The team won <strong>$50,000</strong> in NASA's LunaRecycle Phase II; I joined after that win and stepped into the co-lead systems engineering seat for <strong>Phase III</strong>, which carries a prize ceiling of <strong>$1.2M</strong>. I own the architecture, requirements flowdown, concept of operations, and cross-subsystem integration driving toward the April 23 PDR.
+    </p>
+
+    <!-- Subsystem decomposition visual -->
+    <div class="subsystem-grid">
+      <div class="subsystem-cell"><div class="subsystem-abbr">PP</div><div class="subsystem-name">Preprocess</div></div>
+      <div class="subsystem-cell"><div class="subsystem-abbr">MT</div><div class="subsystem-name">Metals</div></div>
+      <div class="subsystem-cell"><div class="subsystem-abbr">PL</div><div class="subsystem-name">Plastics</div></div>
+      <div class="subsystem-cell"><div class="subsystem-abbr">MW</div><div class="subsystem-name">Microwave</div></div>
+      <div class="subsystem-cell"><div class="subsystem-abbr">EL</div><div class="subsystem-name">Electrical</div></div>
+      <div class="subsystem-cell"><div class="subsystem-abbr">CD</div><div class="subsystem-name">CD&amp;H</div></div>
+      <div class="subsystem-cell"><div class="subsystem-abbr">ST</div><div class="subsystem-name">Structures</div></div>
+    </div>
+
+    <div class="project-tech">
+      <span class="tech-tag">Systems Engineering</span>
+      <span class="tech-tag">Requirements (FR/PR/IR/SR)</span>
+      <span class="tech-tag">ConOps</span>
+      <span class="tech-tag">ICDs</span>
+      <span class="tech-tag">Trade Studies</span>
+      <span class="tech-tag">2.45 GHz SSMG</span>
+      <span class="tech-tag">Pyrolysis</span>
+      <span class="tech-tag">SiC Susceptor</span>
+      <span class="tech-tag">ISS Express Rack Heritage</span>
+    </div>
+
+    <!-- Milestone timeline (schedule to PDR) -->
+    <div class="v-timeline" style="grid-template-columns:repeat(6,1fr);">
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">SCR</div><div class="v-desc">Mar 26<br>ConOps + L0</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">REQ</div><div class="v-desc">Apr 2<br>FR/PR/IR</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">TRADE</div><div class="v-desc">Apr 9<br>Studies</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">L1</div><div class="v-desc">Apr 16<br>Subsystem arch</div></div>
+      <div class="v-stage active"><div class="v-dot"></div><div class="v-label">PDR</div><div class="v-desc">Apr 23<br>Design pkg</div></div>
+      <div class="v-stage"><div class="v-dot"></div><div class="v-label">SHOW</div><div class="v-desc">Apr 28<br>LF Showcase</div></div>
+    </div>
+
+    <div class="project-highlights">
+      <div class="highlight-card">
+        <div class="highlight-val">7</div>
+        <div class="highlight-label">Subsystems (L0–L1)</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-val">7</div>
+        <div class="highlight-label">Operational Modes</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-val">500g</div>
+        <div class="highlight-label">Min Batch / Cycle</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-val">$1.2M</div>
+        <div class="highlight-label">Phase III Ceiling</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); line-height:1.8;">
+      <strong style="color:var(--accent); letter-spacing:2px; font-size:10px;">SE DELIVERABLES</strong><br>
+      Authored &amp; presented SCR covering stakeholder analysis, L0 architecture, operational modes, and schedule &middot; Drove requirements flowdown from NASA Phase 2 Rules through system-level FR/PR/IR/SR with full traceability &middot; Defined Concept of Operations across 7 modes with transport and life-cycle phases &middot; Coordinating cross-subsystem interface control documents across all 7 subsystems &middot; Running trade studies on SSMG vs. magnetron, sorting mechanisms, and thermal management
+    </div>
+  </div>
+
+  <!-- FEATURED #2: Satellite Ground Station -->
+  <div class="project-featured fade-in">
+    <div class="project-badge" style="color:var(--accent); background:var(--accent-dim); border-color:var(--accent-dim);">&#9733; Featured &middot; Solo Build</div>
+    <h3 class="project-title">Autonomous Satellite Ground Station</h3>
+    <div class="project-meta">
+      <span>&#128225; 8,570+ lines</span>
+      <span>&#128640; 11 satellites tracked</span>
+      <span>&#128197; Jan 2026 &ndash; Present</span>
+      <span>&#127760; V3+ Verified</span>
+    </div>
+
+    <!-- Hero: HMI screenshot -->
+    <div class="project-media">
+      <img src="assets/ground-station/hmi-screenshot.png" alt="3D mission operations HMI — SATCOM orbital pass visualizer" class="project-media-hero">
+      <div class="project-media-caption">SATCOM // 3D Mission Operations HMI</div>
+    </div>
+
+    <p class="project-desc">
+      Solo-built autonomous ground station for NOAA APT and METEOR LRPT weather-satellite image reception. Custom VHF antenna, SAWbird LNA, RTL-SDR v4, and a full software pipeline spanning orbital prediction (SGP4), real-time RF capture (C++), APT/LRPT signal decoding (FM/AM and OQPSK &rarr; Viterbi &rarr; CCSDS &rarr; Reed-Solomon), and ML-driven mission planning. A browser-based 3D mission-operations interface built with Three.js tracks 11 spacecraft across 5 constellations &mdash; NOAA, METEOR, ISS, Terra/Aqua, and Landsat &mdash; with live AOS/TCA/LOS prediction, elevation profiles, and Doppler shift.
+    </p>
+
+    <!-- Hardware callout: RTL-SDR -->
+    <div class="media-gallery" style="grid-template-columns: 1fr;">
+      <img src="assets/ground-station/rtl-sdr-v4.jpg" alt="RTL-SDR Blog V4 software-defined radio — receiver hardware for the ground station" style="aspect-ratio: 21/9;">
+    </div>
+
+    <div class="project-tech">
+      <span class="tech-tag">Python</span>
+      <span class="tech-tag">C++</span>
+      <span class="tech-tag">JavaScript</span>
+      <span class="tech-tag">Three.js / WebGL</span>
+      <span class="tech-tag">MATLAB</span>
+      <span class="tech-tag">scikit-learn</span>
+      <span class="tech-tag">Skyfield / SGP4</span>
+      <span class="tech-tag">RTL-SDR</span>
+      <span class="tech-tag">REST API</span>
+      <span class="tech-tag">CCSDS / Reed-Solomon</span>
+    </div>
+
+    <!-- V-timeline (10 stages, includes V3.1) -->
+    <div class="v-timeline">
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">V0</div><div class="v-desc">Orbital<br>±15s</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">V0.5</div><div class="v-desc">SDR env<br>verified</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">V1</div><div class="v-desc">RF link<br>first capture</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">V2</div><div class="v-desc">SAWbird<br>20 dB gain</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">V3</div><div class="v-desc">831 syncs<br>decoded</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">V3.1</div><div class="v-desc">USB fix<br>287 syncs</div></div>
+      <div class="v-stage active"><div class="v-dot"></div><div class="v-label">V3+</div><div class="v-desc">Clean img<br>QFH ant.</div></div>
+      <div class="v-stage"><div class="v-dot"></div><div class="v-label">V4</div><div class="v-desc">Auto<br>Doppler</div></div>
+      <div class="v-stage"><div class="v-dot"></div><div class="v-label">V5</div><div class="v-desc">25+ imgs<br>auto</div></div>
+      <div class="v-stage"><div class="v-dot"></div><div class="v-label">V6</div><div class="v-desc">ML mission<br>planning</div></div>
+    </div>
+
+    <div class="project-highlights">
+      <div class="highlight-card">
+        <div class="highlight-val">7</div>
+        <div class="highlight-label">Subsystems (L0–L2)</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-val">831</div>
+        <div class="highlight-label">APT Sync Pulses (Best)</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-val">11</div>
+        <div class="highlight-label">Spacecraft Tracked</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-val">REST</div>
+        <div class="highlight-label">API + 3D HMI</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); line-height:1.8;">
+      <strong style="color:var(--accent); letter-spacing:2px; font-size:10px;">DECODERS</strong><br>
+      NOAA APT: FM demod &rarr; lowpass &rarr; AM envelope &rarr; sync correlation &rarr; line extraction &middot;
+      METEOR LRPT: AGC &rarr; RRC matched filter &rarr; Gardner timing &rarr; Costas PLL &rarr; Viterbi (k=7, r=1/2) &rarr; CCSDS &rarr; Reed-Solomon &rarr; multi-channel AVHRR reassembly
+    </div>
+  </div>
+
+  <!-- Secondary projects -->
+  <div class="projects-grid">
+    <div class="project-card fade-in">
+      <img src="assets/rtl-sdr/fm-dipole.jpg" alt="Custom FM-band dipole antenna" class="project-card-image">
+      <div class="project-badge" style="color:var(--accent);background:var(--accent-dim);border-color:var(--accent-dim);">Completed</div>
+      <h3 class="project-title">RTL-SDR Signal Processing &amp; Antenna Systems</h3>
+      <div class="project-meta"><span>MATLAB &middot; L0–L2 Architecture &middot; V0–V4 Verified</span></div>
+      <p class="project-desc">
+        End-to-end FM-band RF receive system: custom-fabricated dipole antenna (coax feed, SMA interface, empirically tuned length), MATLAB DSP pipeline using <code>comm.SDRRTLReceiver</code>, and a structured five-stage verification campaign (V0 SDR sanity &rarr; V1 end-to-end RF &rarr; V2 orientation/placement sensitivity &rarr; V3 FM demodulation with intelligible audio recovery &rarr; V4 quantitative gain-sweep characterization). Receiver behavior quantified via PSD peak, noise floor, and SNR-like metrics. All results from physical hardware, not simulation.
+      </p>
+      <div class="project-tech">
+        <span class="tech-tag">MATLAB</span>
+        <span class="tech-tag">RTL-SDR v4</span>
+        <span class="tech-tag">DSP / FFT</span>
+        <span class="tech-tag">FM Demodulation</span>
+        <span class="tech-tag">Antenna Fabrication</span>
+        <span class="tech-tag">PSD Analysis</span>
+      </div>
+    </div>
+
+    <div class="project-card fade-in">
+      <img src="assets/tone-control/pcb.jpg" alt="Tone control / karaoke PCB with LF412CP op-amps" class="project-card-image">
+      <div class="project-badge" style="color:var(--accent);background:var(--accent-dim);border-color:var(--accent-dim);">Completed</div>
+      <h3 class="project-title">Tone Control / Karaoke Circuit</h3>
+      <div class="project-meta"><span>EE 210 &middot; Fall 2025</span></div>
+      <p class="project-desc">
+        Five-block analog audio system: stereo mixer with karaoke vocal cancellation, Baxandall tone control (bass/treble shelving), variable volume stage, 4-level LED VU display, and headphone output buffer. Designed in Multisim, prototyped on breadboard, fabricated onto PCB with LF412CP op-amps, verified through bench testing with function generator and oscilloscope.
+      </p>
+      <div class="project-tech">
+        <span class="tech-tag">Multisim</span>
+        <span class="tech-tag">LTspice</span>
+        <span class="tech-tag">Op-Amp Circuits</span>
+        <span class="tech-tag">PCB Design</span>
+        <span class="tech-tag">Analog Signal Processing</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section class="section" id="research">
+  <div class="section-header fade-in">
+    <div class="section-tag">03 // Research</div>
+    <h2 class="section-title">Research Operations</h2>
+  </div>
+
+  <div class="research-grid">
+    <div class="research-card fade-in">
+      <div class="research-icon">&#127777;&#65039;</div>
+      <div class="research-lab">HEATER Laboratory</div>
+      <h3 class="research-title">Thermal Systems &amp; Heat Transfer</h3>
+      <p class="research-desc">
+        Designed and procured an experimental setup for non-invasive frost imaging using thermal and optical sensing. Developed LabVIEW data acquisition systems for supercritical CO<sub>2</sub> loop instrumentation. Staged integration of new accumulators, thermocouples, and sensors into a two-phase heat transfer loop. Performed system-level modeling of Navy chiller systems, collaborating across cross-domain subsystems.
+      </p>
+    </div>
+
+    <div class="research-card fade-in">
+      <div class="research-icon">&#128225;</div>
+      <div class="research-lab">Systems Design Lab &middot; Senior Thesis Track</div>
+      <h3 class="research-title">Space Systems &amp; SDR Research</h3>
+      <p class="research-desc">
+        Planning undergraduate senior thesis research in <strong>space communication systems</strong> and <strong>software-defined radio</strong>, building on the autonomous ground-station work and the SSPL QFH antenna effort. Targeting completion in the 2026&ndash;27 academic year.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section" id="experience">
+  <div class="section-header fade-in">
+    <div class="section-tag">04 // Experience</div>
+    <h2 class="section-title">Mission History</h2>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item fade-in">
+      <div class="timeline-date">Summer 2026 (Incoming)</div>
+      <div class="timeline-role">Spacecraft Systems Engineering Intern</div>
+      <div class="timeline-org">Millennium Space Systems, A Boeing Company &middot; Chantilly, VA</div>
+      <ul class="timeline-bullets">
+        <li>Supporting systems testing and integration for national security spacecraft payloads</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-date">March 2026 - Present</div>
+      <div class="timeline-role">Undergraduate Research Assistant</div>
+      <div class="timeline-org">Systems Design Lab &middot; Penn State</div>
+      <ul class="timeline-bullets">
+        <li>Planning undergraduate thesis research in space communication systems and software-defined radio</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-date">January 2026 - Present</div>
+      <div class="timeline-role">Co-Lead Systems Engineer &middot; NASA LunaRecycle Challenge</div>
+      <div class="timeline-org">Student Space Programs Lab (SSPL) &middot; Penn State</div>
+      <ul class="timeline-bullets">
+        <li>Joined the team after its $50K Phase II win and stepped into co-lead systems engineering for Phase III (prize ceiling $1.2M)</li>
+        <li>Co-leading systems engineering on a lunar microwave-based recycling system through PDR and prototype build</li>
+        <li>Defined 7-subsystem architecture (L0&ndash;L1) with traced functional, performance, interface, and safety requirements</li>
+        <li>Developed full Concept of Operations including 7 operational modes with transport and life-cycle phases</li>
+        <li>Authored and presented SCR covering stakeholder analysis, architecture, requirements, and schedule</li>
+        <li>Coordinating cross-subsystem interface definitions and requirements flowdown to PDR (April 23, 2026)</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-date">August 2025 - Present</div>
+      <div class="timeline-role">Undergraduate Research Assistant</div>
+      <div class="timeline-org">HEATER Laboratory &middot; Penn State</div>
+      <ul class="timeline-bullets">
+        <li>Designed and procured experimental setup for non-invasive frost imaging using thermal and optical sensing</li>
+        <li>Developed LabVIEW data acquisition systems for supercritical CO<sub>2</sub> loop instrumentation and analysis</li>
+        <li>Staged integration of new accumulators, thermocouples, and sensors into a two-phase heat transfer loop</li>
+        <li>Performed system-level modeling of Navy chiller systems, collaborating across cross-domain subsystems</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item fade-in">
+      <div class="timeline-date">June 2025 - August 2025</div>
+      <div class="timeline-role">Mechanical Engineering Intern</div>
+      <div class="timeline-org">ATI Specialty Rolled Products &middot; Monaca, PA</div>
+      <ul class="timeline-bullets">
+        <li>Project managed the full system overhaul of a planar mill belt grinder under a 3.5-week timeline</li>
+        <li>Oversaw installation of new Siemens drives and PLC/HMI controls, ensuring proper system integration</li>
+        <li>Directed contractors for mechanical restoration while running plate trials and final system validation</li>
+        <li>Coordinated oil level sensor installation including wiring, mounting, and commissioning</li>
+        <li>Diagnosed and resolved air compressor faults, performing troubleshooting, setup, and return-to-service</li>
+        <li>Performed trade studies and analysis on competing industrial ultrasonic defect testing systems</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- INVOLVEMENT & AWARDS -->
+<section class="section" id="involvement">
+  <div class="section-header fade-in">
+    <div class="section-tag">05 // Involvement & Awards</div>
+    <h2 class="section-title">Ground Support</h2>
+  </div>
+
+  <div class="involvement-grid fade-in">
+    <div class="involvement-card">
+      <div class="involvement-org">Alpha Phi Delta Fraternity</div>
+      <div class="involvement-roles">
+        Risk Manager &middot; Philanthropy Chair<br>
+        Asst. New Member Educator<br>
+        Internal J-Board<br>
+        Professional Development Chair
+      </div>
+      <div class="involvement-dates">Feb 2024 - Present &middot; 115 members</div>
+    </div>
+    <div class="involvement-card">
+      <div class="involvement-org">Society of Engineering Science</div>
+      <div class="involvement-roles">Student Relations</div>
+      <div class="involvement-dates">Aug 2025 - Present</div>
+    </div>
+    <div class="involvement-card">
+      <div class="involvement-org">Radio Club of America</div>
+      <div class="involvement-roles">Member</div>
+      <div class="involvement-dates">Mar 2026 - Present</div>
+    </div>
+    <div class="involvement-card">
+      <div class="involvement-org">Aviation Society</div>
+      <div class="involvement-roles">Member</div>
+      <div class="involvement-dates">Aug 2025 - Present</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;" class="fade-in">
+    <div class="section-tag" style="margin-bottom:24px;">Honors &amp; Awards</div>
+    <div class="awards-row">
+      <div class="award-item">
+        <div class="award-icon">&#127942;</div>
+        <div>
+          <div class="award-text">NASA LunaRecycle Phase II Winner &mdash; Team</div>
+          <div class="award-sub">$50,000 &middot; 2026 &middot; now co-lead SE for Phase III</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-icon">&#127891;</div>
+        <div>
+          <div class="award-text">Dean's List</div>
+          <div class="award-sub">5 of 5 semesters</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-icon">&#127942;</div>
+        <div>
+          <div class="award-text">Thermo Fisher Scientific Scholarship</div>
+          <div class="award-sub">2025</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-icon">&#127942;</div>
+        <div>
+          <div class="award-text">Alpha Phi Delta Fraternity Scholarship</div>
+          <div class="award-sub">2024, 2025</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-icon">&#127942;</div>
+        <div>
+          <div class="award-text">Anthony S. Pane &amp; Carl D. Ross Memorial Scholarship</div>
+          <div class="award-sub">2024-25</div>
+        </div>
+      </div>
+      <div class="award-item">
+        <div class="award-icon">&#127942;</div>
+        <div>
+          <div class="award-text">PSU College of Engineering Vierck Scholarship</div>
+          <div class="award-sub">2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER / CONTACT -->
+<footer class="footer" id="contact">
+  <div class="section-tag" style="justify-content:center;margin-bottom:16px;">06 // Contact</div>
+  <h2 class="section-title" style="text-align:center;">Establish Comm Link</h2>
+  <div class="footer-links">
+    <a href="mailto:lukejwasz@gmail.com">lukejwasz@gmail.com</a>
+    <a href="mailto:ljw5734@psu.edu">ljw5734@psu.edu</a>
+    <a href="https://github.com/lukejwaszyn" target="_blank">GitHub</a>
+    <a href="https://www.linkedin.com/in/luke-waszyn-6a35592b4" target="_blank">LinkedIn</a>
+    <a href="assets/Waszyn_Resume.pdf" target="_blank">Resume (PDF)</a>
+    <a href="tel:7246508485">(724) 650-8485</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Luke J. Waszyn II &middot; Built with obsessive attention to detail</div>
+</footer>
+
+<script>
+// ====== STARFIELD ======
+(function() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let w, h, stars = [], shootingStars = [];
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Generate stars
+  for (let i = 0; i < 400; i++) {
+    stars.push({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.2 + 0.2,
+      a: Math.random() * 0.6 + 0.2,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinkleOffset: Math.random() * Math.PI * 2
+    });
+  }
+
+  function spawnShootingStar() {
+    shootingStars.push({
+      x: Math.random() * w,
+      y: Math.random() * h * 0.5,
+      vx: (Math.random() - 0.3) * 8,
+      vy: Math.random() * 4 + 2,
+      life: 1,
+      length: Math.random() * 60 + 30
+    });
+  }
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+
+    // Stars
+    const t = Date.now() * 0.001;
+    for (const s of stars) {
+      const twinkle = Math.sin(t * s.twinkleSpeed * 60 + s.twinkleOffset) * 0.3 + 0.7;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180, 210, 240, ${s.a * twinkle})`;
+      ctx.fill();
+    }
+
+    // Shooting stars
+    for (let i = shootingStars.length - 1; i >= 0; i--) {
+      const ss = shootingStars[i];
+      ss.x += ss.vx;
+      ss.y += ss.vy;
+      ss.life -= 0.015;
+
+      if (ss.life <= 0) { shootingStars.splice(i, 1); continue; }
+
+      const grad = ctx.createLinearGradient(
+        ss.x, ss.y,
+        ss.x - ss.vx * ss.length / 8, ss.y - ss.vy * ss.length / 8
+      );
+      grad.addColorStop(0, `rgba(180, 220, 255, ${ss.life})`);
+      grad.addColorStop(1, 'rgba(180, 220, 255, 0)');
+
+      ctx.beginPath();
+      ctx.moveTo(ss.x, ss.y);
+      ctx.lineTo(ss.x - ss.vx * ss.length / 8, ss.y - ss.vy * ss.length / 8);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    frame++;
+    if (frame % 200 === 0 && Math.random() > 0.3) spawnShootingStar();
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ====== SCROLL FADE-IN ======
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ====== PARALLAX ORBITS ======
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  document.querySelectorAll('.hero-orbit').forEach((orbit, i) => {
+    orbit.style.transform = `rotate(${scrollY * 0.02 * (i + 1)}deg)`;
+  });
+});
+
+// ====== IMAGE FALLBACK (graceful placeholder if asset missing) ======
+document.querySelectorAll('img').forEach(img => {
+  img.addEventListener('error', function() {
+    this.style.background = 'linear-gradient(135deg, var(--panel-solid), var(--bg-deep))';
+    this.style.minHeight = '200px';
+    this.alt = '[MISSING: ' + this.getAttribute('src') + ']';
+    this.removeAttribute('src');
+  });
+});
+</script>
+
+</body>
+</html>
