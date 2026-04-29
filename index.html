@@ -883,16 +883,25 @@ body {
       <span>&#128100; Joined post-Phase II as Co-Lead SE</span>
       <span>&#128197; Jan 2026 &ndash; Present</span>
       <span>&#127942; Phase II Winner &middot; Phase III Competing</span>
+      <span>&#127891; Faculty Advisor: Dr. Sven Bil&eacute;n</span>
     </div>
 
-    <!-- Hero: team concept sketches -->
+    <!-- Hero: team at LF Capstone Showcase -->
     <div class="project-media">
-      <img src="assets/lunarecycle/concept-sketches.jpg" alt="RECLAIM team concept sketches — pre-processing, metal casting, and gas collection" class="project-media-hero" style="aspect-ratio:auto; object-fit:contain; background:#f8f6ee; padding:20px;">
-      <div class="project-media-caption">Team Concept Sketches // Pre-Processing · Metal Casting · Gas Collection</div>
+      <img src="assets/lunarecycle/team-showcase.jpg" alt="RECLAIM team at the Penn State Learning Factory Capstone Showcase, April 28, 2026" class="project-media-hero">
+      <div class="project-media-caption">RECLAIM Team // LF Capstone Showcase &middot; April 28, 2026</div>
+    </div>
+
+    <!-- Supplementary: team concept sketches -->
+    <div class="media-gallery" style="grid-template-columns: 1fr;">
+      <img src="assets/lunarecycle/concept-sketches.jpg" alt="RECLAIM team concept sketches \u2014 pre-processing, metal casting, and gas collection" style="aspect-ratio:auto; object-fit:contain; background:#f8f6ee; padding:20px; max-height: 480px;">
     </div>
 
     <p class="project-desc">
-      RECLAIM is a microwave-based in-situ recycling system designed for lunar surface operations. Under <strong>Penn State's Student Space Programs Lab (SSPL)</strong>, the team is developing a closed-loop platform that converts inhabitant waste &mdash; aluminum, Nomex, textiles, foam, and plastics &mdash; into usable feedstock through a three-stage thermal cycle: a 2.45 GHz solid-state microwave generator, dual-path thermal processing (SiC susceptor-coupled smelting for metals, inert-atmosphere pyrolysis for plastics), and automated material handling. The team won <strong>$50,000</strong> in NASA's LunaRecycle Phase II; I joined after that win and stepped into the co-lead systems engineering seat for <strong>Phase III</strong>, which carries a prize ceiling of <strong>$1.2M</strong>. I own the architecture, requirements flowdown, concept of operations, and cross-subsystem integration driving toward the April 23 PDR.
+      RECLAIM is a microwave-based in-situ recycling system designed for lunar surface operations. Under <strong>Penn State's Student Space Programs Lab (SSPL)</strong>, the team is developing a closed-loop platform that converts inhabitant waste &mdash; aluminum, polyethylene, Nomex, textiles, foam, and rehydratable pouches &mdash; into reusable feedstocks. A <strong>6 kW GaN solid-state microwave generator</strong> (RFHIC) with a HOMER STHT autotuner drives a <strong>WR340 waveguide</strong> that is time-shared between two reaction chambers: an <strong>HFSS-validated cylindrical metals chamber</strong> (16 cm radius, 26.4 cm height) with SiC susceptor and alumina drain-plug gravity casting, and a <strong>12&quot; tri-clamp pyrolysis spool</strong> running ZSM-5/SiC packed bed at 750&deg;C under 10&ndash;15 kPa vacuum, with concentric-tube condenser and Tedlar gas capture for syngas, bio-oil, and char outputs.
+    </p>
+    <p class="project-desc" style="margin-top:-8px;">
+      The team won <strong>$50,000</strong> in NASA's LunaRecycle Phase II; I joined after that win and stepped into the co-lead systems engineering seat for <strong>Phase III</strong> (prize ceiling <strong>$1.2M</strong>, demonstration July 2026). I own the architecture, requirements flowdown, concept of operations, and cross-subsystem integration; the team has already presented PDR (April 23) and the Learning Factory Capstone Showcase (April 28). RECLAIM inherits directly from SSPL's <strong>SMELT</strong> program (BIG Idea 2023, &gt;95% Al recovery) and is designed as a plug-in application for Dr. Bil&eacute;n's <strong>ILUMEN</strong> lunar-microwave economy architecture.
     </p>
 
     <!-- Subsystem decomposition visual -->
@@ -912,20 +921,23 @@ body {
       <span class="tech-tag">ConOps</span>
       <span class="tech-tag">ICDs</span>
       <span class="tech-tag">Trade Studies</span>
-      <span class="tech-tag">2.45 GHz SSMG</span>
-      <span class="tech-tag">Pyrolysis</span>
-      <span class="tech-tag">SiC Susceptor</span>
-      <span class="tech-tag">ISS Express Rack Heritage</span>
+      <span class="tech-tag">RFHIC 6 kW GaN SSMG</span>
+      <span class="tech-tag">WR340 Waveguide</span>
+      <span class="tech-tag">HFSS</span>
+      <span class="tech-tag">ZSM-5/SiC Pyrolysis</span>
+      <span class="tech-tag">NI cRIO + LabVIEW</span>
+      <span class="tech-tag">SMELT Heritage</span>
+      <span class="tech-tag">ILUMEN Architecture</span>
     </div>
 
-    <!-- Milestone timeline (schedule to PDR) -->
+    <!-- Milestone timeline (schedule complete through PDR + Showcase) -->
     <div class="v-timeline" style="grid-template-columns:repeat(6,1fr);">
       <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">SCR</div><div class="v-desc">Mar 26<br>ConOps + L0</div></div>
       <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">REQ</div><div class="v-desc">Apr 2<br>FR/PR/IR</div></div>
-      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">TRADE</div><div class="v-desc">Apr 9<br>Studies</div></div>
-      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">L1</div><div class="v-desc">Apr 16<br>Subsystem arch</div></div>
-      <div class="v-stage active"><div class="v-dot"></div><div class="v-label">PDR</div><div class="v-desc">Apr 23<br>Design pkg</div></div>
-      <div class="v-stage"><div class="v-dot"></div><div class="v-label">SHOW</div><div class="v-desc">Apr 28<br>LF Showcase</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">L1</div><div class="v-desc">Apr 9<br>Trades + ICDs</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">SUB</div><div class="v-desc">Apr 16<br>Subsystem arch</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">PDR</div><div class="v-desc">Apr 23<br>Design pkg</div></div>
+      <div class="v-stage complete"><div class="v-dot"></div><div class="v-label">SHOW</div><div class="v-desc">Apr 28<br>LF Showcase</div></div>
     </div>
 
     <div class="project-highlights">
@@ -934,12 +946,12 @@ body {
         <div class="highlight-label">Subsystems (L0–L1)</div>
       </div>
       <div class="highlight-card">
-        <div class="highlight-val">7</div>
-        <div class="highlight-label">Operational Modes</div>
+        <div class="highlight-val">6 kW</div>
+        <div class="highlight-label">GaN SSMG @ 2.45 GHz</div>
       </div>
       <div class="highlight-card">
-        <div class="highlight-val">500g</div>
-        <div class="highlight-label">Min Batch / Cycle</div>
+        <div class="highlight-val">750&deg;C</div>
+        <div class="highlight-label">Pyrolysis Bed Temp</div>
       </div>
       <div class="highlight-card">
         <div class="highlight-val">$1.2M</div>
@@ -949,7 +961,7 @@ body {
 
     <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); line-height:1.8;">
       <strong style="color:var(--accent); letter-spacing:2px; font-size:10px;">SE DELIVERABLES</strong><br>
-      Authored &amp; presented SCR covering stakeholder analysis, L0 architecture, operational modes, and schedule &middot; Drove requirements flowdown from NASA Phase 2 Rules through system-level FR/PR/IR/SR with full traceability &middot; Defined Concept of Operations across 7 modes with transport and life-cycle phases &middot; Coordinating cross-subsystem interface control documents across all 7 subsystems &middot; Running trade studies on SSMG vs. magnetron, sorting mechanisms, and thermal management
+      Authored &amp; presented SCR covering stakeholder analysis, L0 architecture, operational modes, and schedule &middot; Drove requirements flowdown from NASA Phase 2 Rules through system-level FR/PR/IR/SR with full traceability &middot; Defined Concept of Operations across 7 modes with transport and life-cycle phases &middot; Coordinating cross-subsystem interface control documents across all 7 subsystems &middot; Presented PDR and LF Capstone Showcase
     </div>
   </div>
 
@@ -1080,20 +1092,25 @@ body {
 
   <div class="research-grid">
     <div class="research-card fade-in">
-      <div class="research-icon">&#127777;&#65039;</div>
-      <div class="research-lab">HEATER Laboratory</div>
-      <h3 class="research-title">Thermal Systems &amp; Heat Transfer</h3>
+      <div class="research-icon">&#10052;&#65039;</div>
+      <div class="research-lab">HEATER Laboratory &middot; Penn State</div>
+      <h3 class="research-title">Frost Imaging &amp; Thermal Systems</h3>
       <p class="research-desc">
-        Designed and procured an experimental setup for non-invasive frost imaging using thermal and optical sensing. Developed LabVIEW data acquisition systems for supercritical CO<sub>2</sub> loop instrumentation. Staged integration of new accumulators, thermocouples, and sensors into a two-phase heat transfer loop. Performed system-level modeling of Navy chiller systems, collaborating across cross-domain subsystems.
+        Sole developer on an X-ray preprocessing pipeline (Python + MATLAB, feature parity) for a frost-formation imaging proof-of-concept under Prof. Vishwakarma. The pipeline ingests raw multi-page TIFF stacks from a veterinary X-ray detector and produces clean, contrast-enhanced 16-bit grayscale frames as input to a downstream ML model: auto-detection of usable frames, flat-field correction, percentile normalization, CLAHE/gamma contrast enhancement, and signal-averaging stacking. Surfaced and worked around several upstream acquisition issues (zero-data dark frames, corrupted TIFF headers, mislabeled JPEG-as-TIFF) without silent failure.
+      </p>
+      <p class="research-desc" style="margin-top:8px;">
+        Prior work at HEATER: designed and procured an experimental setup for non-invasive frost imaging using thermal and optical sensing; LabVIEW DAQ for supercritical CO<sub>2</sub> loop instrumentation; staged integration of accumulators, thermocouples, and sensors into a two-phase heat transfer loop; system-level modeling of Navy chiller systems.
       </p>
     </div>
 
     <div class="research-card fade-in">
-      <div class="research-icon">&#128225;</div>
-      <div class="research-lab">Systems Design Lab &middot; Senior Thesis Track</div>
-      <h3 class="research-title">Space Systems &amp; SDR Research</h3>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:8px;">
+        <img src="assets/about/sdl-logo.png" alt="Systems Design Lab logo" style="height:42px; width:auto; flex-shrink:0; filter: drop-shadow(0 0 8px var(--accent-glow));">
+        <div class="research-lab" style="margin-bottom:0;">Systems Design Lab &middot; Penn State</div>
+      </div>
+      <h3 class="research-title">Senior Thesis: SDR Lunar Penetrating Radar</h3>
       <p class="research-desc">
-        Planning undergraduate senior thesis research in <strong>space communication systems</strong> and <strong>software-defined radio</strong>, building on the autonomous ground-station work and the SSPL QFH antenna effort. Targeting completion in the 2026&ndash;27 academic year.
+        Confirmed senior thesis under Dr. Sven Bil&eacute;n on a <strong>software-defined radio implementation of a lunar penetrating radar</strong>, building on Dr. Bil&eacute;n's lunar microwave economy work and on the autonomous ground-station and SDR signal-processing projects. The work is analogous to current sub-surface lunar imaging research (e.g. Chang'e LPR heritage) and aims to leverage modern SDR architectures for a more flexible, lower-mass instrument. Targeting completion in the 2026&ndash;27 academic year.
       </p>
     </div>
   </div>
@@ -1118,10 +1135,11 @@ body {
 
     <div class="timeline-item fade-in">
       <div class="timeline-date">March 2026 - Present</div>
-      <div class="timeline-role">Undergraduate Research Assistant</div>
-      <div class="timeline-org">Systems Design Lab &middot; Penn State</div>
+      <div class="timeline-role">Undergraduate Research Assistant &middot; Senior Thesis Track</div>
+      <div class="timeline-org">Systems Design Lab (Dr. Sven Bil&eacute;n) &middot; Penn State</div>
       <ul class="timeline-bullets">
-        <li>Planning undergraduate thesis research in space communication systems and software-defined radio</li>
+        <li>Confirmed senior thesis: <strong>SDR-based Lunar Penetrating Radar</strong>, building on Dr. Bil&eacute;n's lunar microwave economy work and the autonomous ground-station / SDR projects</li>
+        <li>Targeting completion in the 2026&ndash;27 academic year</li>
       </ul>
     </div>
 
@@ -1142,8 +1160,10 @@ body {
     <div class="timeline-item fade-in">
       <div class="timeline-date">August 2025 - Present</div>
       <div class="timeline-role">Undergraduate Research Assistant</div>
-      <div class="timeline-org">HEATER Laboratory &middot; Penn State</div>
+      <div class="timeline-org">HEATER Laboratory (Prof. Vishwakarma) &middot; Penn State</div>
       <ul class="timeline-bullets">
+        <li>Sole developer of a Python + MATLAB X-ray preprocessing pipeline for a frost-formation imaging ML proof-of-concept (flat-field correction, CLAHE/gamma enhancement, signal-averaging, 16-bit grayscale output)</li>
+        <li>Diagnosed multiple upstream acquisition failures (zero-data darks, corrupted TIFF headers, mislabeled file formats) and built graceful-degradation fallbacks rather than silent failures</li>
         <li>Designed and procured experimental setup for non-invasive frost imaging using thermal and optical sensing</li>
         <li>Developed LabVIEW data acquisition systems for supercritical CO<sub>2</sub> loop instrumentation and analysis</li>
         <li>Staged integration of new accumulators, thermocouples, and sensors into a two-phase heat transfer loop</li>
