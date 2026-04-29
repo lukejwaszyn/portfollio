@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WASZYN // Mission Control</title>
-<meta name="description" content="Luke J. Waszyn II — Engineering Science @ Penn State. Systems engineering, RF & signal processing, space systems.">
+<meta name="description" content="Luke J. Waszyn II. Engineering Science @ Penn State. Systems engineering, RF & signal processing, space systems.">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@200;300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
@@ -46,6 +46,40 @@ body {
 #starfield {
   position: fixed; inset: 0; z-index: 0;
   pointer-events: none;
+}
+
+/* ====== MILKY WAY GALACTIC BAND ====== */
+.milky-way {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.milky-way::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 60%;
+  top: 35%;
+  left: -50%;
+  background:
+    radial-gradient(ellipse 50% 100% at 30% 50%, rgba(140, 130, 200, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 100% at 70% 50%, rgba(180, 160, 220, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(100, 130, 180, 0.05) 0%, transparent 80%);
+  transform: rotate(-18deg);
+  filter: blur(40px);
+}
+.milky-way::after {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 30%;
+  top: 50%;
+  left: -50%;
+  background:
+    radial-gradient(ellipse 40% 100% at 25% 50%, rgba(200, 180, 220, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 100% at 60% 50%, rgba(255, 220, 200, 0.025) 0%, transparent 60%);
+  transform: rotate(-18deg);
+  filter: blur(20px);
 }
 
 /* ====== SCANLINES ====== */
@@ -423,7 +457,8 @@ body {
 .v-timeline::before {
   content: ''; position: absolute;
   top: 17px; left: 2%; right: 2%; height: 1px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 55%, var(--gold) 55%, var(--gold) 60%, var(--border) 60%, var(--border) 100%);
+  background: var(--accent);
+  opacity: 0.5;
   z-index: 1;
 }
 
@@ -500,6 +535,96 @@ body {
   filter: brightness(0.9);
 }
 .media-gallery img:hover { filter: brightness(1); transform: scale(1.02); }
+
+/* ====== CAROUSEL ====== */
+.carousel {
+  position: relative;
+  margin: 0 -40px 28px -40px;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.carousel-track {
+  display: flex;
+  width: 100%;
+  height: clamp(300px, 50vw, 560px);
+  scroll-snap-type: x mandatory;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.carousel-track::-webkit-scrollbar { display: none; }
+.carousel-slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-deep);
+}
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.carousel-slide-light {
+  background: #f8f6ee;
+}
+.carousel-slide-light img {
+  padding: 20px;
+}
+.carousel-caption {
+  position: absolute;
+  bottom: 12px; left: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(2,2,4,0.8);
+  padding: 4px 10px; border-radius: 2px;
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+.carousel-nav {
+  position: absolute;
+  bottom: 12px; right: 16px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 3;
+}
+.carousel-btn {
+  background: rgba(2,2,4,0.8);
+  border: 1px solid var(--border-bright);
+  color: var(--accent);
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  font-size: 18px; line-height: 1;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0; padding-bottom: 2px;
+}
+.carousel-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.carousel-dots {
+  display: flex; gap: 6px; align-items: center;
+}
+.carousel-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-bright);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.carousel-dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-dim);
+}
 
 /* ====== SUBSYSTEM LIST (for LunaRecycle) ====== */
 .subsystem-grid {
@@ -750,8 +875,9 @@ body {
 </head>
 <body>
 
-<!-- STARFIELD -->
+<!-- STARFIELD + MILKY WAY -->
 <canvas id="starfield"></canvas>
+<div class="milky-way"></div>
 <div class="scanlines"></div>
 <div class="grid-overlay"></div>
 
@@ -812,7 +938,7 @@ body {
   <div class="about-grid">
     <div class="about-text fade-in">
       <!-- PORTRAIT on mobile/small: shown inline above text via media query reordering; on desktop shows in right column via grid order -->
-      <p>I'm a junior in <strong>Engineering Science</strong> at Penn State with a minor in <strong>Engineering Mechanics</strong> and a <strong>Certificate in Space Systems Engineering</strong>. I build systems that bridge hardware and software &mdash; from custom RF receive chains and analog circuits to ML pipelines and 3D mission control interfaces.</p>
+      <p>I'm a junior in <strong>Engineering Science</strong> at Penn State with a minor in <strong>Engineering Mechanics</strong> and a <strong>Certificate in Space Systems Engineering</strong>. I build systems that bridge hardware and software, from custom RF receive chains and analog circuits to ML pipelines and 3D mission control interfaces.</p>
       <p>My work lives at the intersection of <strong>formal systems engineering</strong> and <strong>hands-on hardware</strong>. I co-lead systems engineering on a NASA LunaRecycle team competing in Phase III (prize ceiling $1.2M), operate an autonomous satellite ground station I built from scratch, and run verification campaigns on RF hardware I solder myself. I care about traceability, measured performance, and shipping things that actually work.</p>
       <p>This summer I'll be joining <strong>Millennium Space Systems (Boeing)</strong> as a Spacecraft Systems Engineering intern.</p>
     </div>
@@ -877,7 +1003,7 @@ body {
   <!-- FEATURED #1: LunaRecycle / RECLAIM -->
   <div class="project-featured fade-in">
     <div class="project-badge">&#9733; Featured &middot; NASA Phase III &middot; $1.2M Ceiling</div>
-    <h3 class="project-title">RECLAIM &mdash; NASA LunaRecycle Challenge</h3>
+    <h3 class="project-title">RECLAIM: NASA LunaRecycle Challenge</h3>
     <div class="project-meta">
       <span>&#127769; Lunar ISRU Recycling</span>
       <span>&#128100; Joined post-Phase II as Co-Lead SE</span>
@@ -886,19 +1012,35 @@ body {
       <span>&#127891; Faculty Advisor: Dr. Sven Bil&eacute;n</span>
     </div>
 
-    <!-- Hero: team at LF Capstone Showcase -->
-    <div class="project-media">
-      <img src="assets/lunarecycle/team-showcase.jpg" alt="RECLAIM team at the Penn State Learning Factory Capstone Showcase, April 28, 2026" class="project-media-hero">
-      <div class="project-media-caption">RECLAIM Team // LF Capstone Showcase &middot; April 28, 2026</div>
-    </div>
-
-    <!-- Supplementary: team concept sketches -->
-    <div class="media-gallery" style="grid-template-columns: 1fr;">
-      <img src="assets/lunarecycle/concept-sketches.jpg" alt="RECLAIM team concept sketches \u2014 pre-processing, metal casting, and gas collection" style="aspect-ratio:auto; object-fit:contain; background:#f8f6ee; padding:20px; max-height: 480px;">
+    <!-- Horizontal scrolling carousel: poster + team photo + sketches -->
+    <div class="carousel">
+      <div class="carousel-track">
+        <div class="carousel-slide">
+          <img src="assets/lunarecycle/poster.jpg" alt="RECLAIM EDSGN 558 Poster: full systems overview">
+          <div class="carousel-caption">EDSGN 558 Poster &middot; Full Systems Overview</div>
+        </div>
+        <div class="carousel-slide">
+          <img src="assets/lunarecycle/team-showcase.jpg" alt="RECLAIM team at the Penn State Learning Factory Capstone Showcase, April 28, 2026">
+          <div class="carousel-caption">LF Capstone Showcase &middot; April 28, 2026</div>
+        </div>
+        <div class="carousel-slide carousel-slide-light">
+          <img src="assets/lunarecycle/concept-sketches.jpg" alt="RECLAIM team concept sketches: pre-processing, metal casting, and gas collection">
+          <div class="carousel-caption">Team Concept Sketches &middot; Pre-Processing, Metal Casting, Gas Collection</div>
+        </div>
+      </div>
+      <div class="carousel-nav">
+        <button class="carousel-btn" data-dir="prev" aria-label="Previous">&#8249;</button>
+        <div class="carousel-dots">
+          <span class="carousel-dot active" data-i="0"></span>
+          <span class="carousel-dot" data-i="1"></span>
+          <span class="carousel-dot" data-i="2"></span>
+        </div>
+        <button class="carousel-btn" data-dir="next" aria-label="Next">&#8250;</button>
+      </div>
     </div>
 
     <p class="project-desc">
-      RECLAIM is a microwave-based in-situ recycling system designed for lunar surface operations. Under <strong>Penn State's Student Space Programs Lab (SSPL)</strong>, the team is developing a closed-loop platform that converts inhabitant waste &mdash; aluminum, polyethylene, Nomex, textiles, foam, and rehydratable pouches &mdash; into reusable feedstocks. A <strong>6 kW GaN solid-state microwave generator</strong> (RFHIC) with a HOMER STHT autotuner drives a <strong>WR340 waveguide</strong> that is time-shared between two reaction chambers: an <strong>HFSS-validated cylindrical metals chamber</strong> (16 cm radius, 26.4 cm height) with SiC susceptor and alumina drain-plug gravity casting, and a <strong>12&quot; tri-clamp pyrolysis spool</strong> running ZSM-5/SiC packed bed at 750&deg;C under 10&ndash;15 kPa vacuum, with concentric-tube condenser and Tedlar gas capture for syngas, bio-oil, and char outputs.
+      RECLAIM is a microwave-based in-situ recycling system designed for lunar surface operations. Under <strong>Penn State's Student Space Programs Lab (SSPL)</strong>, the team is developing a closed-loop platform that converts inhabitant waste, including aluminum, polyethylene, Nomex, textiles, foam, and rehydratable pouches, into reusable feedstocks. A <strong>6 kW GaN solid-state microwave generator</strong> (RFHIC) with a HOMER STHT autotuner drives a <strong>WR340 waveguide</strong> that is time-shared between two reaction chambers: an <strong>HFSS-validated cylindrical metals chamber</strong> (16 cm radius, 26.4 cm height) with SiC susceptor and alumina drain-plug gravity casting, and a <strong>12&quot; tri-clamp pyrolysis spool</strong> running ZSM-5/SiC packed bed at 750&deg;C under 10&ndash;15 kPa vacuum, with concentric-tube condenser and Tedlar gas capture for syngas, bio-oil, and char outputs.
     </p>
     <p class="project-desc" style="margin-top:-8px;">
       The team won <strong>$50,000</strong> in NASA's LunaRecycle Phase II; I joined after that win and stepped into the co-lead systems engineering seat for <strong>Phase III</strong> (prize ceiling <strong>$1.2M</strong>, demonstration July 2026). I own the architecture, requirements flowdown, concept of operations, and cross-subsystem integration; the team has already presented PDR (April 23) and the Learning Factory Capstone Showcase (April 28). RECLAIM inherits directly from SSPL's <strong>SMELT</strong> program (BIG Idea 2023, &gt;95% Al recovery) and is designed as a plug-in application for Dr. Bil&eacute;n's <strong>ILUMEN</strong> lunar-microwave economy architecture.
@@ -978,17 +1120,17 @@ body {
 
     <!-- Hero: HMI screenshot -->
     <div class="project-media">
-      <img src="assets/ground-station/hmi-screenshot.png" alt="3D mission operations HMI — SATCOM orbital pass visualizer" class="project-media-hero">
+      <img src="assets/ground-station/hmi-screenshot.png" alt="3D mission operations HMI: SATCOM orbital pass visualizer" class="project-media-hero">
       <div class="project-media-caption">SATCOM // 3D Mission Operations HMI</div>
     </div>
 
     <p class="project-desc">
-      Solo-built autonomous ground station for NOAA APT and METEOR LRPT weather-satellite image reception. Custom VHF antenna, SAWbird LNA, RTL-SDR v4, and a full software pipeline spanning orbital prediction (SGP4), real-time RF capture (C++), APT/LRPT signal decoding (FM/AM and OQPSK &rarr; Viterbi &rarr; CCSDS &rarr; Reed-Solomon), and ML-driven mission planning. A browser-based 3D mission-operations interface built with Three.js tracks 11 spacecraft across 5 constellations &mdash; NOAA, METEOR, ISS, Terra/Aqua, and Landsat &mdash; with live AOS/TCA/LOS prediction, elevation profiles, and Doppler shift.
+      Solo-built autonomous ground station for NOAA APT and METEOR LRPT weather-satellite image reception. Custom VHF antenna, SAWbird LNA, RTL-SDR v4, and a full software pipeline spanning orbital prediction (SGP4), real-time RF capture (C++), APT/LRPT signal decoding (FM/AM and OQPSK &rarr; Viterbi &rarr; CCSDS &rarr; Reed-Solomon), and ML-driven mission planning. A browser-based 3D mission-operations interface built with Three.js tracks 11 spacecraft across 5 constellations (NOAA, METEOR, ISS, Terra/Aqua, and Landsat) with live AOS/TCA/LOS prediction, elevation profiles, and Doppler shift.
     </p>
 
     <!-- Hardware callout: RTL-SDR -->
     <div class="media-gallery" style="grid-template-columns: 1fr;">
-      <img src="assets/ground-station/rtl-sdr-v4.jpg" alt="RTL-SDR Blog V4 software-defined radio — receiver hardware for the ground station" style="aspect-ratio: 21/9;">
+      <img src="assets/ground-station/rtl-sdr-v4.jpg" alt="RTL-SDR Blog V4 software-defined radio: receiver hardware for the ground station" style="aspect-ratio: 21/9;">
     </div>
 
     <div class="project-tech">
@@ -1228,7 +1370,7 @@ body {
       <div class="award-item">
         <div class="award-icon">&#127942;</div>
         <div>
-          <div class="award-text">NASA LunaRecycle Phase II Winner &mdash; Team</div>
+          <div class="award-text">NASA LunaRecycle Phase II Winner: Team</div>
           <div class="award-sub">$50,000 &middot; 2026 &middot; now co-lead SE for Phase III</div>
         </div>
       </div>
@@ -1300,15 +1442,53 @@ body {
   window.addEventListener('resize', resize);
   resize();
 
-  // Generate stars
-  for (let i = 0; i < 400; i++) {
+  // Generate stars (denser cluster along galactic band, sparse elsewhere)
+  // Galactic band runs at -18 degrees through middle of viewport
+  function bandDensity(x, y) {
+    // Distance from the band center line
+    const angle = -18 * Math.PI / 180;
+    const cx = w / 2, cy = h / 2;
+    const dx = x - cx, dy = y - cy;
+    // Rotate to band-aligned coords
+    const perp = -dx * Math.sin(angle) + dy * Math.cos(angle);
+    // Gaussian falloff perpendicular to band
+    return Math.exp(-(perp * perp) / (2 * (h * 0.25) ** 2));
+  }
+
+  // Base background stars
+  for (let i = 0; i < 250; i++) {
     stars.push({
       x: Math.random() * w,
       y: Math.random() * h,
       r: Math.random() * 1.2 + 0.2,
-      a: Math.random() * 0.6 + 0.2,
+      a: Math.random() * 0.5 + 0.15,
       twinkleSpeed: Math.random() * 0.02 + 0.005,
-      twinkleOffset: Math.random() * Math.PI * 2
+      twinkleOffset: Math.random() * Math.PI * 2,
+      hue: 'rgba(180, 210, 240,'
+    });
+  }
+  // Galactic band stars (clustered)
+  for (let i = 0; i < 350; i++) {
+    let x, y, density;
+    let attempts = 0;
+    do {
+      x = Math.random() * w;
+      y = Math.random() * h;
+      density = bandDensity(x, y);
+      attempts++;
+    } while (Math.random() > density && attempts < 5);
+
+    const tint = Math.random();
+    const hue = tint < 0.6 ? 'rgba(220, 215, 240,'
+              : tint < 0.85 ? 'rgba(255, 230, 200,'
+              : 'rgba(200, 220, 255,';
+    stars.push({
+      x, y,
+      r: Math.random() * 1.5 + 0.3,
+      a: (Math.random() * 0.6 + 0.3) * (0.4 + density * 0.6),
+      twinkleSpeed: Math.random() * 0.025 + 0.005,
+      twinkleOffset: Math.random() * Math.PI * 2,
+      hue
     });
   }
 
@@ -1333,7 +1513,7 @@ body {
       const twinkle = Math.sin(t * s.twinkleSpeed * 60 + s.twinkleOffset) * 0.3 + 0.7;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(180, 210, 240, ${s.a * twinkle})`;
+      ctx.fillStyle = (s.hue || 'rgba(180, 210, 240,') + ` ${s.a * twinkle})`;
       ctx.fill();
     }
 
@@ -1385,6 +1565,32 @@ window.addEventListener('scroll', () => {
   const scrollY = window.scrollY;
   document.querySelectorAll('.hero-orbit').forEach((orbit, i) => {
     orbit.style.transform = `rotate(${scrollY * 0.02 * (i + 1)}deg)`;
+  });
+});
+
+// ====== CAROUSEL ======
+document.querySelectorAll('.carousel').forEach(carousel => {
+  const track = carousel.querySelector('.carousel-track');
+  const slides = carousel.querySelectorAll('.carousel-slide');
+  const dots = carousel.querySelectorAll('.carousel-dot');
+  const btnPrev = carousel.querySelector('[data-dir="prev"]');
+  const btnNext = carousel.querySelector('[data-dir="next"]');
+
+  function goTo(i) {
+    const idx = Math.max(0, Math.min(slides.length - 1, i));
+    track.scrollTo({ left: idx * track.clientWidth, behavior: 'smooth' });
+  }
+  function currentIdx() {
+    return Math.round(track.scrollLeft / track.clientWidth);
+  }
+  btnPrev.addEventListener('click', () => goTo(currentIdx() - 1));
+  btnNext.addEventListener('click', () => goTo(currentIdx() + 1));
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => goTo(parseInt(dot.dataset.i)));
+  });
+  track.addEventListener('scroll', () => {
+    const i = currentIdx();
+    dots.forEach((d, j) => d.classList.toggle('active', j === i));
   });
 });
 
