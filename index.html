@@ -518,6 +518,102 @@ body {
   backdrop-filter: blur(4px);
 }
 
+/* HMI launcher (click-to-load interactive demo) */
+.hmi-launcher {
+  position: relative;
+  cursor: pointer;
+}
+.hmi-launcher .project-media-hero {
+  transition: filter 0.4s, transform 0.6s;
+  filter: brightness(0.55) saturate(0.85);
+}
+.hmi-launcher:hover .project-media-hero {
+  filter: brightness(0.7) saturate(1);
+}
+.hmi-launch-btn {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: rgba(2, 4, 8, 0.65);
+  border: 1px solid var(--accent-dim);
+  color: var(--text-bright);
+  padding: 28px 48px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s;
+  z-index: 5;
+}
+.hmi-launch-btn:hover {
+  border-color: var(--accent);
+  background: rgba(126, 184, 216, 0.15);
+  box-shadow: 0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow);
+  transform: translate(-50%, -50%) scale(1.04);
+}
+.hmi-launch-icon {
+  font-size: 22px;
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--accent);
+  margin-bottom: 4px;
+}
+.hmi-launch-text {
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-bright);
+}
+.hmi-launch-sub {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Active state: iframe is loaded */
+.hmi-launcher.active {
+  cursor: default;
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+.hmi-launcher.active .project-media-hero,
+.hmi-launcher.active .hmi-launch-btn,
+.hmi-launcher.active .project-media-caption {
+  display: none;
+}
+.hmi-iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  background: var(--bg-deep);
+}
+.hmi-iframe-controls {
+  position: absolute;
+  top: 12px; right: 16px;
+  display: flex; gap: 8px;
+  z-index: 6;
+}
+.hmi-control-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  background: rgba(2, 4, 8, 0.85);
+  border: 1px solid var(--border-bright);
+  color: var(--accent);
+  padding: 6px 12px; border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s;
+}
+.hmi-control-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
 .media-gallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1119,10 +1215,15 @@ body {
       <span>&#127760; V3+ Verified</span>
     </div>
 
-    <!-- Hero: HMI screenshot -->
-    <div class="project-media">
-      <img src="assets/ground-station/hmi-screenshot.png" alt="3D mission operations HMI: SATCOM orbital pass visualizer" class="project-media-hero">
+    <!-- Hero: HMI screenshot + click to launch live demo -->
+    <div class="project-media hmi-launcher" id="hmi-launcher">
+      <img src="assets/ground-station/hmi-screenshot.png" alt="3D mission operations HMI: SATCOM orbital pass visualizer" class="project-media-hero" id="hmi-screenshot">
       <div class="project-media-caption">SATCOM // 3D Mission Operations HMI</div>
+      <button class="hmi-launch-btn" id="hmi-launch-btn" type="button" aria-label="Launch interactive HMI demo">
+        <span class="hmi-launch-icon">&#9654;</span>
+        <span class="hmi-launch-text">Launch Interactive Demo</span>
+        <span class="hmi-launch-sub">Live Three.js HMI &middot; demo mode</span>
+      </button>
     </div>
 
     <p class="project-desc">
@@ -1566,6 +1667,40 @@ window.addEventListener('scroll', () => {
     orbit.style.transform = `rotate(${scrollY * 0.02 * (i + 1)}deg)`;
   });
 });
+
+// ====== HMI LAUNCHER ======
+(function() {
+  const launcher = document.getElementById('hmi-launcher');
+  const launchBtn = document.getElementById('hmi-launch-btn');
+  if (!launcher || !launchBtn) return;
+
+  launchBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    launcher.classList.add('active');
+
+    const iframe = document.createElement('iframe');
+    iframe.src = 'assets/ground-station/satellite-viz.html';
+    iframe.className = 'hmi-iframe';
+    iframe.allow = 'fullscreen';
+    iframe.title = 'SATCOM Interactive HMI';
+    launcher.appendChild(iframe);
+
+    // Add control bar (close + open in new tab)
+    const controls = document.createElement('div');
+    controls.className = 'hmi-iframe-controls';
+    controls.innerHTML = `
+      <a class="hmi-control-btn" href="assets/ground-station/satellite-viz.html" target="_blank" rel="noopener">Open Fullscreen &#8599;</a>
+      <button class="hmi-control-btn" type="button" id="hmi-close-btn">Close &#10005;</button>
+    `;
+    launcher.appendChild(controls);
+
+    document.getElementById('hmi-close-btn').addEventListener('click', () => {
+      launcher.classList.remove('active');
+      iframe.remove();
+      controls.remove();
+    });
+  });
+})();
 
 // ====== CAROUSEL ======
 document.querySelectorAll('.carousel').forEach(carousel => {
