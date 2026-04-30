@@ -832,6 +832,63 @@ body {
   color: var(--accent);
 }
 
+/* ====== ENGINEERING PRACTICE ====== */
+.practice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.practice-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: 6px;
+  padding: 24px 28px;
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  display: flex; flex-direction: column;
+}
+.practice-card:hover {
+  border-color: var(--border-bright);
+  border-left-color: var(--accent-bright);
+  background: rgba(126, 184, 216, 0.04);
+}
+.practice-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.practice-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-white);
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+.practice-body {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text);
+  flex: 1;
+}
+.practice-body strong {
+  color: var(--text-bright);
+  font-weight: 600;
+}
+.practice-evidence {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  line-height: 1.5;
+}
+
 /* Research cards */
 .research-grid {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
@@ -949,6 +1006,7 @@ body {
   .about-grid { grid-template-columns: 1fr; }
   .projects-grid { grid-template-columns: 1fr; }
   .research-grid { grid-template-columns: 1fr; }
+  .practice-grid { grid-template-columns: 1fr; }
   .involvement-grid { grid-template-columns: 1fr 1fr; }
   .hero-stats { flex-direction: column; gap: 16px; }
   .project-featured { padding: 28px; }
@@ -984,6 +1042,7 @@ body {
   <div class="nav-links">
     <a href="#about">About</a>
     <a href="#projects">Projects</a>
+    <a href="#practice">Practice</a>
     <a href="#research">Research</a>
     <a href="#experience">Experience</a>
     <a href="#contact">Contact</a>
@@ -1327,10 +1386,143 @@ body {
   </div>
 </section>
 
+<!-- ENGINEERING PRACTICE -->
+<section class="section" id="practice">
+  <div class="section-header fade-in">
+    <div class="section-tag">03 // Engineering Practice</div>
+    <h2 class="section-title">How I Practice Engineering</h2>
+    <p class="section-subtitle">A walkthrough of how I approach problem formulation, scientific reasoning, ethics, and verification, anchored in the projects above. Written for ABET portfolio review (ESC criteria 1.1, 1.3, 1.4, 2.1, 2.2, 2.3, 4.1, 4.2, 5.2, 6.2, 6.3, 7.2).</p>
+  </div>
+
+  <div class="practice-grid">
+
+    <!-- 1.1 Problem formulation -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">1.1 // Problem Formulation</div>
+      <h3 class="practice-title">Identifying and Bounding Complex Problems</h3>
+      <p class="practice-body">
+        On RECLAIM the upstream problem (NASA's "recycle inhabitant waste on the lunar surface") is open-ended; my job as co-lead SE is to formulate it concretely. I structured it by deriving Driving Requirements (DR-1 through DR-8) from the Phase 2 Rules, then flowing them down through Functional, Performance, Interface, and Safety requirements (FR/PR/IR/SR) with rationale and parent links. Constraints we bounded explicitly: SSPL must reuse SMELT-heritage WR340 hardware, the demo runs in Earth ambient (not vacuum), the full ConOps assumes a single time-shared 2.45 GHz SSMG (never simultaneous on metals + plastics), and demo-tier scope excludes the Thermal and Sorting subsystems. Assumptions are documented in the L1 Requirements operational-assumptions section so reviewers know exactly what we're claiming.
+      </p>
+      <div class="practice-evidence">Evidence: RECLAIM L1 Requirements doc &middot; SCR &middot; PDR Risk Register</div>
+    </div>
+
+    <!-- 1.3 Science principles -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">1.3 // Scientific Principles</div>
+      <h3 class="practice-title">Physics Driving the Design</h3>
+      <p class="practice-body">
+        The autonomous ground station is end-to-end physics. SGP4 orbital propagation is Newtonian mechanics in the Earth-centered inertial frame with J2 perturbations; Doppler shift is special-relativistic frequency change applied to a known orbital velocity; APT and LRPT decoding apply Fourier analysis (FFT/PSD), matched filtering against a square-root raised-cosine pulse, and Costas-loop carrier recovery. RECLAIM's microwave heating relies on dielectric loss through the imaginary part of complex permittivity (&epsilon;&Prime;) of polyethylene and SiC; smelting depends on phase-change thermodynamics across the aluminum solidus-liquidus boundary; pyrolysis is endothermic depolymerization at 750 &deg;C bounded by Arrhenius kinetics on the ZSM-5 catalyst. I don't just use these results; the design choices (cylindrical chamber resonance geometry, susceptor selection, vacuum operation to suppress oxidation) are direct consequences of the underlying physics.
+      </p>
+      <div class="practice-evidence">Evidence: Ground station decoder pipeline &middot; RECLAIM thermal architecture</div>
+    </div>
+
+    <!-- 1.4 Math principles -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">1.4 // Mathematics</div>
+      <h3 class="practice-title">From Linear Algebra to Statistics</h3>
+      <p class="practice-body">
+        The ground station's SGP4 propagator is iterative numerical integration of two-body equations of motion with secular perturbations, projected through ECI &rarr; ECEF &rarr; topocentric coordinate transforms (rotation matrices and quaternions). The LRPT decoder uses a Viterbi algorithm (dynamic programming over a trellis), Reed-Solomon decoding (polynomial GF(2&#x2078;) arithmetic), and a Costas PLL whose loop dynamics are second-order linear. The RTL-SDR project's V4 stage is gain-sweep characterization with statistical metrics: PSD peak, noise floor estimated from the median-absolute-deviation of off-carrier bins, and SNR-like figures with explicit error bounds. The HEATER X-ray pipeline applies percentile normalization, contrast-limited adaptive histogram equalization (a discrete-window CDF transform), and signal averaging with &radic;N noise reduction.
+      </p>
+      <div class="practice-evidence">Evidence: SGP4 implementation &middot; LRPT Viterbi/RS decoder &middot; X-ray pipeline</div>
+    </div>
+
+    <!-- 2.1 Economics -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">2.1 // Economics</div>
+      <h3 class="practice-title">Cost-Benefit and the $1.2M / kg Reality</h3>
+      <p class="practice-body">
+        RECLAIM's economic argument is the entire reason it exists. Lunar surface delivery currently runs about $1.2M per kilogram on a CLPS-class lander (Astrobotic published rate). For every kilogram of inhabitant waste a lunar habitat would otherwise dispose of via controlled surface dumping or off-planet transport, recycling on-station saves on the order of $1M in displaced upmass for replacement feedstock. That sets the upper bound on what RECLAIM can cost to develop, deploy, and operate while still being economically rational. On the build side, I track the prototype BOM weekly: the 6 kW RFHIC SSMG is the dominant capital line item, balanced against the manual labor cost saved versus the previous SMELT setup. Even the ground station has cost-benefit reasoning: the $25 RTL-SDR + $40 SAWbird LNA stack delivers the same NOAA APT capture capability that purpose-built receivers used to charge thousands for, which is the entire premise of the project.
+      </p>
+      <div class="practice-evidence">Evidence: NASA Astrobotic CLPS pricing &middot; RECLAIM mass budget &middot; SDR BOM</div>
+    </div>
+
+    <!-- 2.2 Public health, safety, welfare -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">2.2 // Health, Safety, Welfare</div>
+      <h3 class="practice-title">Defense in Depth on a 6 kW Microwave</h3>
+      <p class="practice-body">
+        RECLAIM operates a 6 kW solid-state microwave generator in a habitat that will eventually contain humans. Microwave leakage at any externally accessible surface must remain below 5 mW/cm&sup2; per FDA 21 CFR 1030.10, which I drove into the system-level requirement <strong>SYS-SR-003</strong>. That requirement cascades into hardware: a chamber-access interlock that physically removes microwave power on any door-open or fault event (independent of software, per <strong>SYS-SR-001</strong>), an operator-accessible E-stop that de-energizes all motion within one second (<strong>SYS-SR-002</strong>), and a leakage survey planned at integration. Risk register entry <strong>R-03</strong> (microwave leakage at the waveguide splitter) is jointly owned by the Microwave lead and SE; mitigation includes inheriting the gasket design from SMELT and running an early leakage survey. Pyrolysis off-gas toxicity (<strong>R-04</strong>) is bounded by ISS Vacuum Exhaust System limits (CO &le; 0.08% vol, H&#8322; &le; 25% LEL).
+      </p>
+      <div class="practice-evidence">Evidence: SYS-SR-001/002/003 &middot; PDR Risk Register R-03/R-04 &middot; FDA 21 CFR 1030.10</div>
+    </div>
+
+    <!-- 2.3 Global/cultural/social/environmental -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">2.3 // Global, Cultural, Social, Environmental</div>
+      <h3 class="practice-title">Closing the Loop in a Closed System</h3>
+      <p class="practice-body">
+        Long-duration human presence beyond LEO is fundamentally an environmental-systems problem. Without recycling, every kilogram of waste a habitat generates either becomes uncontrolled lunar surface debris or is launched back to Earth at extraordinary cost. RECLAIM is designed as a plug-in application for Dr. Bil&eacute;n's <strong>ILUMEN</strong> architecture, a shared 2.45 GHz microwave economy that lets multiple lunar applications draw from a common power source over a standardized WR340 waveguide. That is consciously a sustainability and infrastructure-reuse argument: closing the resource loop on the Moon, minimizing transported mass, and treating waste streams as feedstock. The cultural dimension matters too: as Artemis-era operations bring international and commercial partners onto the surface, common-architecture reusable systems lower the coordination cost of multinational missions.
+      </p>
+      <div class="practice-evidence">Evidence: ILUMEN architecture (Bil&eacute;n 2025, AIAA ASCEND) &middot; RECLAIM closed-loop ConOps</div>
+    </div>
+
+    <!-- 4.1 Ethics -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">4.1 // Ethics &amp; Professional Responsibility</div>
+      <h3 class="practice-title">Owning the Margin Between What Works and What's Safe</h3>
+      <p class="practice-body">
+        Two situations have made this concrete for me. On RECLAIM, our PDR risk register includes R-08 (schedule slip to the July 2026 NASA deadline) with mitigation language that explicitly names "scope cut criteria." That is a deliberate ethical choice: when a deadline is fixed, the honest engineering response is to cut scope before cutting safety margin or honesty about readiness. I'd rather present a smaller demo that works than a flashier one that misrepresents capability. On the HEATER X-ray pipeline, the upstream lab acquisition system had several silent failure modes (zero-data dark frames, corrupted TIFF headers, mislabeled JPEG-as-TIFF). The professionally responsible path was not to silently produce best-effort output, it was to fail loudly with a clear warning and surface the issue back to the lab so the root cause gets fixed. NSPE Code of Ethics calls this "hold paramount the safety, health, and welfare of the public" and "be objective and truthful;" both apply to graduate-quality data as much as they do to bridges.
+      </p>
+      <div class="practice-evidence">Evidence: PDR Risk Register R-08 &middot; X-ray pipeline error-surfacing &middot; NSPE Code of Ethics I.1, II.3</div>
+    </div>
+
+    <!-- 4.2 Societal impact -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">4.2 // Societal Impact</div>
+      <h3 class="practice-title">Multiple Audiences, Multiple Stakes</h3>
+      <p class="practice-body">
+        Every project I work on touches more than one stakeholder context, and the design decisions reflect that. RECLAIM's primary stakeholder is NASA, but the secondary stakeholders are future commercial lunar operators (cost reduction), the international Artemis partnership (architectural compatibility), and ultimately the astronauts living next to the system (safety). The autonomous ground station, beyond being personal SE practice, is part of a wider amateur radio and citizen-science community: the techniques (RTL-SDR, NOAA APT decoding, custom QFH antennas) are deliberately accessible so that high-school students or hobbyists with $200 of hardware can learn weather-satellite reception. The HEATER X-ray work supports thermal-systems research with applications from data-center cooling to space-rated radiators, communities I won't directly meet but whose work my preprocessing serves. Recognizing that an engineering decision lands across multiple audiences keeps me honest about who I'm actually building for.
+      </p>
+      <div class="practice-evidence">Evidence: RECLAIM stakeholder analysis (SCR) &middot; Ground station open-source approach</div>
+    </div>
+
+    <!-- 5.2 Integrating perspectives -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">5.2 // Integrating Perspectives</div>
+      <h3 class="practice-title">Where Subsystem Leads Disagree, the SE Brokers</h3>
+      <p class="practice-body">
+        RECLAIM has 7 subsystem leads (Preprocess, Plastics, Metals, Microwave, Electrical, CD&amp;H, Structures) plus PM, faculty advisor, and a co-SE. Most interesting design decisions surface as cross-subsystem disagreement: the Microwave lead wants the chamber gasket spec to inherit directly from SMELT to minimize re-design risk; the Structures lead wants a thinner, lighter mating flange to hit the 120 kg mass ceiling; the Electrical lead wants the interlock contactor on a different bus than the SSMG PSU. As co-SE my job is not to pick a winner; it is to surface the underlying constraints (SMELT heritage flow-time, mass margin, power-bus segmentation), document them as interface requirements, and run the meeting where consensus emerges. The result is a design every lead can defend in front of their own subsystem, not a directive from above. Integrating perspectives is not a soft skill; it is the technical core of systems engineering.
+      </p>
+      <div class="practice-evidence">Evidence: RECLAIM L1 Requirements ICDs &middot; cross-subsystem design reviews</div>
+    </div>
+
+    <!-- 6.2 Experiments -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">6.2 // Experimentation</div>
+      <h3 class="practice-title">Staged Verification, Not Hopeful Demoing</h3>
+      <p class="practice-body">
+        The RTL-SDR signal-processing project ran a structured five-stage verification campaign (V0 SDR sanity check &rarr; V1 end-to-end RF link with FFT/PSD confirmation of FM broadcast carriers &rarr; V2 orientation and placement sensitivity sweeps with the custom dipole &rarr; V3 functional FM demodulation with intelligible audio recovery as the engineering conclusion &rarr; V4 quantitative gain-sweep characterization). Each stage had a written pass/fail criterion before data collection, not after. The autonomous ground station follows the same pattern at larger scale (V0 through V6), and its V3 milestone (831 APT sync pulses on a NOAA 19 capture, 89.0&deg; elevation) is the first hard engineering conclusion: "the chain end-to-end works on a real satellite." That's the difference between an experiment that informs design and an experiment that just feels good to run.
+      </p>
+      <div class="practice-evidence">Evidence: RTL-SDR V0-V4 verification campaign &middot; Ground station V0-V6 plan</div>
+    </div>
+
+    <!-- 6.3 Data analysis & validation -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">6.3 // Data Analysis &amp; Validation</div>
+      <h3 class="practice-title">Statistics, Not Just Plots</h3>
+      <p class="practice-body">
+        On the RTL-SDR project, V4 quantifies receiver behavior across a tuner-gain sweep using PSD peak, estimated noise floor (median-of-bins approach to be robust against carrier leakage), and a SNR-like difference metric, with each gain repeated multiple times so I can plot trend with error bars instead of single-shot results. On the ground station, the V3.1 milestone was driven by anomaly hunting in the data: NOAA 19 at 89.0&deg; produced 831 sync pulses but visible diagonal interference; the root cause was eventually narrowed to USB-C hub noise injection by swapping in an Apple USB-A to USB-C adapter (NOAA 21 follow-up: 287 sync pulses with cleaner structure). That is engineering validation: comparing measured against expected, identifying the discrepancy, isolating the cause, and confirming the fix on a separate capture. The HEATER X-ray pipeline uses the same discipline, comparing CLAHE-enhanced output against raw and gamma-corrected comparators on a 4-panel side-by-side so judgment about contrast quality is not eyeballed.
+      </p>
+      <div class="practice-evidence">Evidence: RTL-SDR V4 metrics &middot; Ground station V3 vs V3.1 captures &middot; HEATER 4-panel comparison</div>
+    </div>
+
+    <!-- 7.2 Independent learning -->
+    <div class="practice-card fade-in">
+      <div class="practice-tag">7.2 // Independent Learning</div>
+      <h3 class="practice-title">Learning by Building Things That Don't Exist Yet</h3>
+      <p class="practice-body">
+        Most of what I do has not been taught to me in a classroom. The autonomous ground station required learning SGP4 from the Skyfield documentation and Vallado's "Fundamentals of Astrodynamics," CCSDS framing from the published spec, OQPSK demodulation from Gardner's original 1986 timing-recovery paper, and Three.js scene-graph design from Discoverthreejs. The RTL-SDR project required teaching myself MATLAB's Communications Toolbox `comm.SDRRTLReceiver` interface and antenna fabrication from W2AEW's videos. RECLAIM's pyrolysis chemistry came from reading the actual literature on ZSM-5 catalysis. My approach: identify the canonical primary source (paper, spec, datasheet), cross-check with one well-regarded secondary (textbook or experienced practitioner), then build the smallest possible thing that exercises the new knowledge before scaling up. The senior thesis on SDR Lunar Penetrating Radar starts the same way: find the Chang'e LPR papers, find the modern SDR-radar literature, find the gap between them.
+      </p>
+      <div class="practice-evidence">Evidence: Ground station bibliography &middot; RTL-SDR engineering notebook &middot; LPR literature review (in progress)</div>
+    </div>
+
+  </div>
+</section>
+
 <!-- RESEARCH -->
 <section class="section" id="research">
   <div class="section-header fade-in">
-    <div class="section-tag">03 // Research</div>
+    <div class="section-tag">04 // Research</div>
     <h2 class="section-title">Research Operations</h2>
   </div>
 
@@ -1363,7 +1555,7 @@ body {
 <!-- EXPERIENCE -->
 <section class="section" id="experience">
   <div class="section-header fade-in">
-    <div class="section-tag">04 // Experience</div>
+    <div class="section-tag">05 // Experience</div>
     <h2 class="section-title">Mission History</h2>
   </div>
 
@@ -1434,7 +1626,7 @@ body {
 <!-- INVOLVEMENT & AWARDS -->
 <section class="section" id="involvement">
   <div class="section-header fade-in">
-    <div class="section-tag">05 // Involvement & Awards</div>
+    <div class="section-tag">06 // Involvement & Awards</div>
     <h2 class="section-title">Ground Support</h2>
   </div>
 
@@ -1517,7 +1709,7 @@ body {
 
 <!-- FOOTER / CONTACT -->
 <footer class="footer" id="contact">
-  <div class="section-tag" style="justify-content:center;margin-bottom:16px;">06 // Contact</div>
+  <div class="section-tag" style="justify-content:center;margin-bottom:16px;">07 // Contact</div>
   <h2 class="section-title" style="text-align:center;">Establish Comm Link</h2>
   <div class="footer-links">
     <a href="mailto:lukejwasz@gmail.com">lukejwasz@gmail.com</a>
