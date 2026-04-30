@@ -6,7 +6,7 @@ I'm a junior studying **Engineering Science** at Penn State with a minor in Engi
 
 This repo is the source for my portfolio site, which you can see live at:
 
-**→ [lukejwaszyn.github.io/portfolio](https://lukejwaszyn.github.io/portfollio/)**
+**→ [lukejwaszyn.github.io/portfolio](https://lukejwaszyn.github.io/portfolio/)**
 
 ## What's on the site
 
@@ -20,7 +20,7 @@ This repo is the source for my portfolio site, which you can see live at:
 ## Repo structure
 
 \`\`\`
-portfollio/
+portfolio/
 ├── index.html                         ← the whole site (single file, no build step)
 └── assets/
     ├── Waszyn_Resume.pdf              ← downloadable from the site
